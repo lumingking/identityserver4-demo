@@ -1,4 +1,4 @@
-﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
@@ -31,8 +31,8 @@ namespace IdentityServer
                 {
                     options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
 
-                    options.ClientId = "<insert here>";
-                    options.ClientSecret = "<insert here>";
+                    options.ClientId = "1049389047949-v2fq6rodj1p1ms7k2c53juike0ef2co2.apps.googleusercontent.com";
+                    options.ClientSecret = "bPVAWHcfYx7X3WRsr3JvDtbk";
                 })
                 .AddOpenIdConnect("oidc", "Demo IdentityServer", options =>
                 {

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MvcClient.Models;
 using System.Diagnostics;
@@ -30,9 +30,18 @@ namespace MvcClient.Controllers
 
             var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            var content = await client.GetStringAsync("https://localhost:6001/identity");
-
-            ViewBag.Json = JArray.Parse(content).ToString();
+            var response = await client.GetAsync("https://localhost:6001/identity");
+            if (!response.IsSuccessStatusCode)
+            {
+                var content = response.StatusCode;
+                ViewBag.Json = content;
+            }
+            else
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                ViewBag.Json = JArray.Parse(content).ToString();
+            }
+            //ViewBag.Json = JArray.Parse(content).ToString();
             return View("json");
         }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
@@ -22,7 +22,7 @@ namespace IdentityServerAspNetIdentity
             var services = new ServiceCollection();
             services.AddLogging();
             services.AddDbContext<ApplicationDbContext>(options =>
-               options.UseSqlite(connectionString));
+               options.UseSqlServer(connectionString));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -35,6 +35,7 @@ namespace IdentityServerAspNetIdentity
                     var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
                     context.Database.Migrate();
 
+                    var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
                     var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
                     var alice = userMgr.FindByNameAsync("alice").Result;
                     if (alice == null)
@@ -99,6 +100,37 @@ namespace IdentityServerAspNetIdentity
                     else
                     {
                         Log.Debug("bob already exists");
+                    }
+
+                    var admin = roleMgr.FindByNameAsync("admin").Result;
+                    if(admin == null)
+                    {
+                        admin = new IdentityRole
+                        {
+                            Name = "admin",
+                            NormalizedName = "administrator"
+                        };
+                        var result = roleMgr.CreateAsync(admin).Result;
+                        if (!result.Succeeded)
+                        {
+                            throw new Exception(result.Errors.First().Description);
+                        }
+
+                        result = roleMgr.AddClaimAsync(admin, new Claim("Class", "Serven")).Result;
+                        if (!result.Succeeded)
+                        {
+                            throw new Exception(result.Errors.First().Description);
+                        }
+                        Log.Debug("admin created");
+                    }
+                    if (!userMgr.IsInRoleAsync(alice, "admin").Result)
+                    {
+                        var result = userMgr.AddToRoleAsync(alice, "admin").Result;
+                        if (!result.Succeeded)
+                        {
+                            throw new Exception(result.Errors.First().Description);
+                        }
+                        Log.Debug("add alice to admin");
                     }
                 }
             }

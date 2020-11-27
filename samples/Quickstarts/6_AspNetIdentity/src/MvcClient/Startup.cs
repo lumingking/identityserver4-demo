@@ -29,6 +29,8 @@ namespace MvcClient
                 options.ResponseType = "code";
                 
                 options.Scope.Add("api1");
+                //Getting claims from the UserInfo endpoint
+                options.GetClaimsFromUserInfoEndpoint = true;
 
                 options.SaveTokens = true;
             });
